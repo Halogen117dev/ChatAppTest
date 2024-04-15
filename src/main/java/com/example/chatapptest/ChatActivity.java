@@ -18,7 +18,7 @@ public class ChatActivity extends AppCompatActivity
 
     ImageView sendButton;
     EditText messageText;
-    UsersAdapter usersAdapter;
+    MessageAdapter messageAdapter;
     RecyclerView recyclerView;
 
     @Override
