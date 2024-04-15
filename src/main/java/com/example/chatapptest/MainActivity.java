@@ -23,7 +23,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
-    UserAdapter userAdapter;
+    UsersAdapter usersAdapter;
     String yourName;
     DatabaseReference databaseReference;
 
@@ -36,10 +36,10 @@ public class MainActivity extends AppCompatActivity {
         String username = getIntent().getStringExtra("name");
         getSupportActionBar().setTitle(username);
 
-        userAdapter = new UserAdapter(this);
+        usersAdapter = new UsersAdapter(this);
         recyclerView = findViewById(R.id.recycler);
 
-        recyclerView.setAdapter(userAdapter);
+        recyclerView.setAdapter(usersAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         databaseReference = FirebaseDatabase.getInstance().getReference("users");
@@ -47,19 +47,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot)
             {
-                userAdapter.clear();
+                usersAdapter.clear();
                 for(DataSnapshot dataSnapshot: snapshot.getChildren())
                 {
                     String uId = dataSnapshot.getKey();
                     UserModel userModel = dataSnapshot.getValue(UserModel.class);
                     if((userModel != null) && (userModel.getUserID() != null) && !(userModel.getUserID().equals(FirebaseAuth.getInstance().getUid())))
                     {
-                        userAdapter.add(userModel);
+                        usersAdapter.add(userModel);
                     }
                 }
 
-                List<UserModel> userModelList = userAdapter.getUserModelList();
-                userAdapter.notifyDataSetChanged();
+                List<UserModel> userModelList = usersAdapter.getUserModelList();
+                usersAdapter.notifyDataSetChanged();
             }
 
             @Override

@@ -1,10 +1,25 @@
 package com.example.chatapptest;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.widget.EditText;
+import android.widget.ImageView;
 
-public class ChatActivity extends AppCompatActivity {
+import com.google.firebase.database.DatabaseReference;
+
+public class ChatActivity extends AppCompatActivity
+{
+    String receiverId, receiverName;
+    String senderId, senderName;
+
+    DatabaseReference dbRefSender, dbRefReceiver, userReference;
+
+    ImageView sendButton;
+    EditText messageText;
+    UsersAdapter usersAdapter;
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
