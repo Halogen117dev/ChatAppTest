@@ -10,82 +10,106 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MyViewHolder>
 {
+    private static final int VIEW_TYPE_SENT = 1;
+    private static final int VIEW_TYPE_RECEIVED = 2;
+
+
     private Context context;
-    private List<UserModel> userModelList;
+    private List<MessageModel> messageModelList;
 
     public MessageAdapter(Context context) {
         this.context = context;
-        this.userModelList = new ArrayList<>();
+        this.messageModelList = new ArrayList<>();
     }
 
 
-    public void add(UserModel userModel)
+    public void add(MessageModel messageModel)
     {
-        userModelList.add(userModel);
+        messageModelList.add(messageModel);
+        notifyDataSetChanged();
     }
 
     public void clear()
     {
-        userModelList.clear();
+        messageModelList.clear();
         notifyDataSetChanged();
     }
 
-
-
-
     @NonNull
     @Override
-    public MessageAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_row, parent, false);
-        return new MyViewHolder(view);
+    public MessageAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+    {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        if (viewType == VIEW_TYPE_SENT)
+        {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_row_sent, parent, false);
+            return new MyViewHolder(view);
+        }
+        else if (viewType==VIEW_TYPE_RECEIVED)
+        {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_row_received, parent, false);
+            return new MyViewHolder(view);
+        }
+
+        return null;
     }
 
     @Override
     public void onBindViewHolder(@NonNull MessageAdapter.MyViewHolder holder, int position)
     {
-        UserModel userModel = userModelList.get(position);
-        holder.name.setText(userModel.getUserName());
-        holder.email.setText(userModel.getUserEmail());
-
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                Intent intent = new Intent(context, ChatActivity.class);
-                intent.putExtra("id", userModel.getUserID());
-                intent.putExtra("name", userModel.getUserName());
-                context.startActivity(intent);
-
-            }
-        });
+        MessageModel messageModel = messageModelList.get(position);
+        if(messageModel.getSenderId().equals(FirebaseAuth.getInstance().getUid()))
+        {
+            holder.textViewSentMessage.setText(messageModel.getMessage());
+        }
+        else
+        {
+            holder.textViewReceivedMessage.setText(messageModel.getMessage());
+        }
     }
 
     @Override
     public int getItemCount()
     {
-        return userModelList.size();
+        return messageModelList.size();
     }
 
-    public List<UserModel> getUserModelList()
+    public List<MessageModel> getMessageModelList()
     {
-        return userModelList;
+        return messageModelList;
     }
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder
     {
-        private TextView name, email;
+        private TextView textViewSentMessage, textViewReceivedMessage;
         public MyViewHolder(@NonNull View itemView)
         {
             super(itemView);
-            name = itemView.findViewById(R.id.username);
-            email = itemView.findViewById(R.id.useremail);
+            textViewSentMessage = itemView.findViewById(R.id.textviewsent);
+            textViewReceivedMessage = itemView.findViewById(R.id.textviewreceived);
 
+        }
+    }
+
+
+    @Override
+    public int getItemViewType(int position)
+    {
+        if(messageModelList.get(position).getSenderId().equals(FirebaseAuth.getInstance().getUid()))
+        {
+            return VIEW_TYPE_SENT;
+        }
+        else
+        {
+            return VIEW_TYPE_RECEIVED;
         }
     }
 }
