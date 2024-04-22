@@ -14,7 +14,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-import android.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -25,7 +25,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,7 +47,7 @@ public class ChatActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar1);
         setSupportActionBar(toolbar);
 
         userReference = FirebaseDatabase.getInstance().getReference("users");
@@ -80,6 +83,12 @@ public class ChatActivity extends AppCompatActivity
                     messages.add(messageModel);
                 }
                 messageAdapter.clear();
+                Collections.sort(messages, new Comparator<MessageModel>() {
+                    @Override
+                    public int compare(MessageModel o1, MessageModel o2) {
+                        return o1.getTimestamp().compareTo(o2.getTimestamp());
+                    }
+                });
                 for(MessageModel message: messages)
                 {
                     messageAdapter.add(message);
@@ -131,6 +140,7 @@ public class ChatActivity extends AppCompatActivity
                 });
 
         dbRefReceiver.child(messageId).setValue(messageModel);
+
         recyclerView.scrollToPosition(messageAdapter.getItemCount() - 1);
         messageText.setText("");
     }
